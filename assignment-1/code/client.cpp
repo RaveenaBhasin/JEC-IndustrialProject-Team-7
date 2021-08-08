@@ -30,7 +30,7 @@ int main() {
         return -1;
     }
     
-    std::ofstream clientFile("client.txt");
+    std::ofstream clientFile("client.txt", std::ios::app);
     char data[4096];
     char received[4096];
     std::cout << "Connected! You can send message now!\n\n";
@@ -67,7 +67,8 @@ int main() {
         std::cout << "server> " << received << std::endl << std::endl;
         clientFile << "server> " << received << std::endl << std::endl;
     }
-    
+    clientFile << "-------------------------------------------------\n\n";
+    clientFile.close();
     close(serverSocket);
     
     return 0;

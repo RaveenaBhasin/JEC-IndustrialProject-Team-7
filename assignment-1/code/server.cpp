@@ -60,7 +60,7 @@ int main() {
         return -1;
     }
     
-    std::ofstream serverFile("server.txt");
+    std::ofstream serverFile("server.txt", std::ios::app);
     
     std::cout << "Started listening on: " << PORT << std::endl;
     serverFile << "Started listening on: " << PORT << std::endl;
@@ -121,7 +121,8 @@ int main() {
         
         data.clear();
     }
-    
+    serverFile << "-------------------------------------------------\n\n";
+    serverFile.close();
     close(clientSocket);
     close(serverSocket);
     
