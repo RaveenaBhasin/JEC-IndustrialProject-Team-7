@@ -15,7 +15,7 @@ int main() {
     sockaddr_in saddr = {
         .sin_family = AF_INET,
         .sin_port = htons(PORT),
-        .sin_addr = INADDR_ANY
+       // .sin_addr = INADDR_ANY
     };
     
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
