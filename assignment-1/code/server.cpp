@@ -17,19 +17,18 @@ int main() {
         std::cout << "Can't create a socket!\n";
         return -1;
     }
-    sockaddr_in saddr = {
-        .sin_family = AF_INET,
-        .sin_port = htons(PORT),
-        .sin_addr.s_addr = INADDR_ANY
-    };
-    
+    sockaddr_in saddr;
+    saddr.sin_family = AF_INET;
+    saddr.sin_port = htons(PORT);
+    //.sin_addr.s_addr = INADDR_ANY
+
     inet_pton(AF_INET, "127.0.0.1", &saddr.sin_addr);
     
-    int opt=1;
-    if(setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == 0) {
-        std::cout << "setsockopt error\n";
-        return -1;
-    }
+    // int opt=1;
+    // if(setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == 0) {
+    //     std::cout << "setsockopt error\n";
+    //     return -1;
+    // }
     
     // bind server with ip/port
     if(bind(serverSocket, (sockaddr*)&saddr, sizeof(saddr))<0) {
