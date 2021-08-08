@@ -6,9 +6,27 @@
 #include <arpa/inet.h>
 #include <string.h> 
 #include <string>
+#include <sstream>
 #include <fstream>
+#include <vector>
 
-#define PORT 5000
+#define PORT 8080
+
+std::vector<std::string> split(char str[], char a) {
+    std::vector<std::string> res;
+    std::stringstream ss(str);
+    std::string temp;
+    while(getline(ss, temp, a)) {
+        res.push_back(temp);
+    }
+    return res;
+}
+
+std::string greet(std::string name) {
+    std::string t = "Welcome from server, ";
+    
+    return t+name;
+}
 
 int main() {
     
@@ -20,8 +38,8 @@ int main() {
     sockaddr_in saddr;
     saddr.sin_family = AF_INET;
     saddr.sin_port = htons(PORT);
-    //.sin_addr.s_addr = INADDR_ANY
-
+    // saddr.sin_addr.s_addr = INADDR_ANY
+    
     inet_pton(AF_INET, "127.0.0.1", &saddr.sin_addr);
     
     // int opt=1;
@@ -78,7 +96,7 @@ int main() {
     char buf[4096];
     while(true) {
         memset(buf, 0, 4096);
-        char greet[4096] = "Welcome from server, ";
+        
         int bytesRecv = recv(clientSocket, buf, 4096, 0);
         if(bytesRecv == -1) {
             std::cout << "There is a connection issue\n";
@@ -91,12 +109,17 @@ int main() {
             break;
         }
 
-        std::cout << "Received: " << buf;
-        serverFile << "Received: " << buf;
-        strcat(greet, buf);
-        send(clientSocket, greet, sizeof(greet), 0);
-        std::cout << "\nSent message to the client!\n\n";
-        serverFile << "\nSent message to the client!\n\n";
+        std::cout << "Received from client: " << buf;
+        serverFile << "Received from client: " << buf;
+        
+        std::vector<std::string> data = split(buf, ' ');
+        std::string str = greet(data[data.size()-1]);
+        
+        send(clientSocket, str.c_str(), str.size(), 0);
+        std::cout << "\nMessage sent to the client!\n\n";
+        serverFile << "\nMessage sent to the client!\n\n";
+        
+        data.clear();
     }
     
     close(clientSocket);

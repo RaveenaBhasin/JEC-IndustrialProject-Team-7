@@ -8,24 +8,22 @@
 #include <string>
 #include <fstream>
 
-#define PORT 5000
+#define PORT 8080
 
 int main() {
     
-    sockaddr_in saddr = {
-        .sin_family = AF_INET,
-        .sin_port = htons(PORT),
-       // .sin_addr = INADDR_ANY
-    };
+    sockaddr_in saddr;
+    saddr.sin_family = AF_INET;
+    saddr.sin_port = htons(PORT);
+    // saddr.sin_addr.s_addr = INADDR_ANY;
     
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if(serverSocket == 0) {
         std::cout << "Socket error\n";
         return -1;
     }
-    // inet_pton(AF_INET, "localhost", &saddr.sin_addr);
-    // int opt=1;
-    // setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
+    
+    inet_pton(AF_INET, "127.0.0.1", &saddr.sin_addr);
     
     if(connect(serverSocket, (sockaddr*)&saddr, sizeof(saddr)) < 0) {
         std::cout << "Connection error\n";
@@ -49,8 +47,8 @@ int main() {
         }
         send(serverSocket, data, sizeof(data), 0);
         
-        std::cout << "Sent message to the server\n";
-        clientFile << "Sent message to the server\n";
+        std::cout << "Message sent!\n";
+        clientFile << "Message sent!\n";
         
         // read(serverSocket, received, 4096);
         
@@ -66,8 +64,8 @@ int main() {
             break;
         }
         
-        std::cout << received << std::endl << std::endl;
-        clientFile << received << std::endl << std::endl;
+        std::cout << "server> " << received << std::endl << std::endl;
+        clientFile << "server> " << received << std::endl << std::endl;
     }
     
     close(serverSocket);
