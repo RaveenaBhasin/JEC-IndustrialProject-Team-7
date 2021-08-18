@@ -72,7 +72,7 @@ class Client {
         
         std::vector<std::string> res = split(userData, ':');
         
-        if(res.size() < 3 || res.size() > 3) {
+        if(res.size() != 3) {
             send(this->socket, "Invalid! Try again...", 22, 0);
             return this->registerClient();
         }
@@ -106,7 +106,7 @@ class Client {
         
         std::vector<std::string> res = split(userData, ':');
         
-        if(res.size() < 2 || res.size() > 2) {
+        if(res.size() != 2) {
             send(this->socket, std::string("Invalid! Try again...").c_str(), 22, 0);
             return this->loginClient();
         }
