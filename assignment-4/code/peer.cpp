@@ -38,8 +38,8 @@ class Download_File_Data {
 };
 
 //personal info
-std::string name="", uid="";
-int trackerSocket, serverSocket, exit_peer=0;
+std::string myName="", myUid="";
+int trackerSocket, serverSocket, exit_program=0;
 char myFile[4096]={0}; //filename:uid:blocks:totalSize:hash
 std::map<std::string, int> connectedPeers;
 
@@ -138,7 +138,7 @@ void* server(void* arg) {
         socklen_t socklen = sizeof(caddr);
         int clientSocket = accept(serverSocket, (sockaddr*)&caddr, &socklen);
         
-        if(exit_peer==1) 
+        if(exit_program==1) 
             pthread_exit(NULL);
             
         char clientData[1024] = {0};
@@ -195,7 +195,7 @@ void* fileDownload(void* arg) {
     pthread_exit(NULL);
 }
 
-void connectPeer(std::string uid, int port) {
+void connectPeer(std::string peer_uid, int port) {
     
     int peerSock = socket(AF_INET, SOCK_STREAM, 0);
     sockaddr_in saddr;
@@ -217,10 +217,10 @@ void connectPeer(std::string uid, int port) {
     //     pthread_exit(NULL);
     // }
     std::cout << "Connection established!\n";
-    std::string myData = name+":"+uid;
+    std::string myData = myName+":"+myUid;
     send(peerSock, myData.c_str(), myData.size(), 0);
     
-    connectedPeers[uid] = peerSock;
+    connectedPeers[peer_uid] = peerSock;
 }
 
 int authentication() {
@@ -253,11 +253,11 @@ int authentication() {
         std::cout << received << std::endl << std::endl;
 
         std::vector<std::string> res = split(received, ' ');
-        if(name.compare("")==0 && res[1].compare("Welcome")==0) {
-            name = res[2];
-            name = name.substr(0, name.size()-1);
+        if(myName.compare("")==0 && res[1].compare("Welcome")==0) {
+            myName = res[2];
+            myName = myName.substr(0, myName.size()-1);
             res = split(data, ':');
-            uid = res[0];
+            myUid = res[0];
             break;
         }
     }
@@ -275,7 +275,7 @@ void signalHandler(int signal) {
     // for(auto& it: connectedPeers) {
     //     close(it.second);
     // }
-    exit_peer=1;
+    exit_program=1;
     close(trackerSocket);
     close(serverSocket);
     exit(signal);
@@ -333,7 +333,7 @@ int main(int argv, char* argc[]) {
     }
     shaOfEachBlock[shaOfEachBlock.size()-1]='\0';
 
-    std::string addData = ":"+uid+":"+std::to_string(blocks)+":"+std::to_string(fileSize)+":"+shaOfEachBlock;
+    std::string addData = ":"+myUid+":"+std::to_string(blocks)+":"+std::to_string(fileSize)+":"+shaOfEachBlock;
     strcat(myFile, addData.c_str());
     send(trackerSocket, myFile, strlen(myFile), 0);
     file.close();
@@ -356,7 +356,7 @@ int main(int argv, char* argc[]) {
         
         if(res[0].compare("connect")==0) {
             //connect:uid
-            if(res[1].compare(uid)==0) {
+            if(res[1].compare(myUid)==0) {
                 std::cout << "You can not connect to yourself!\n";
                 continue;
             }
@@ -375,7 +375,7 @@ int main(int argv, char* argc[]) {
             connectPeer(res[1], atoi(received));
         } else if(res[0].compare("disconnect")==0) {
             //disconnect:uid
-            if(res[1].compare(uid)==0) {
+            if(res[1].compare(myUid)==0) {
                 std::cout << "You can not disconnect to yourself!\n";
                 continue;
             }
